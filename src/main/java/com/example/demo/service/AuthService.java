@@ -1,5 +1,6 @@
 package com.example.demo.service;
-
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.model.user;
 import com.example.demo.dto.SignupRequest;
 import com.example.demo.model.PendingRegistration;
 import com.example.demo.repository.pendingRegistrationRepository;
@@ -71,9 +72,83 @@ public class AuthService {
 
         pendingRepository.save(pending);
 
-        // Send OTP through Gmail
         emailService.sendOtp(email, otp);
 
         return "OTP sent successfully to your email";
     }
+
+public String verifyOtp(String email, String otp) {
+
+    email = email.toLowerCase().trim();
+
+   
+    PendingRegistration pending =
+            pendingRepository.findByEmail(email)
+                    .orElse(null);
+
+   
+    if (pending == null) {
+        return "No pending registration found";
+    }
+
+  
+    if (LocalDateTime.now().isAfter(pending.getOtpExpiry())) {
+
+        pendingRepository.deleteByEmail(email);
+
+        return "OTP has expired";
+    }
+
+   
+    if (!pending.getOtp().equals(otp)) {
+        return "Invalid OTP";
+    }
+
+    
+    com.example.demo.model.user user =
+            new com.example.demo.model.user(
+                    pending.getName(),
+                    pending.getEmail(),
+                    pending.getPassword()
+            );
+
+
+    userRepository.save(user);
+
+    
+    pendingRepository.deleteByEmail(email);
+
+    return "Registration successful";
+        }
+public String login(LoginRequest request) {
+
+   
+    String email = request.getEmail()
+            .toLowerCase()
+            .trim();
+
+    User user =
+            userRepository.findByEmail(email)
+                    .orElse(null);
+
+  
+    if (user == null) {
+        return "Invalid email or password";
+    }
+
+   
+    boolean passwordMatches =
+            passwordEncoder.matches(
+                    request.getPassword(),
+                    user.getPassword()
+            );
+
+    
+    if (!passwordMatches) {
+        return "Invalid email or password";
+    }
+
+    return "Login successful. Welcome "
+            + user.getName();
+}
 }
