@@ -127,7 +127,7 @@ public String login(LoginRequest request) {
             .toLowerCase()
             .trim();
 
-    User user =
+    user user =
             userRepository.findByEmail(email)
                     .orElse(null);
 
