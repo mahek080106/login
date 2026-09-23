@@ -2,11 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.SignupRequest;
-import com.example.demo.dto.VerifyOtpRequest;
 import com.example.demo.service.AuthService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,22 +21,7 @@ public class AuthController {
     public ResponseEntity<String> signup(
             @Valid @RequestBody SignupRequest request) {
 
-        String response =
-                authService.signup(request);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(
-            @Valid @RequestBody VerifyOtpRequest request) {
-
-        String response =
-                authService.verifyOtp(
-                        request.getEmail(),
-                        request.getOtp()
-                );
-
+        String response = authService.signup(request);
         return ResponseEntity.ok(response);
     }
 
@@ -47,9 +29,7 @@ public class AuthController {
     public ResponseEntity<String> login(
             @Valid @RequestBody LoginRequest request) {
 
-        String response =
-                authService.login(request);
-
+        String response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 }
